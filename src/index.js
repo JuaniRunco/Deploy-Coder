@@ -19,7 +19,10 @@ const app = express();
 
 app.use(express.json());
 
-app.use("/api", infoRouter, randomRouter);
+app.get("/", (req, res)=>{
+  res.json("Bienvenido, para obtener informacion de la api use /info. Para el calculo de numeros random use /randoms/:cantidad por ejemplo 5")
+})
+app.use("/", infoRouter, randomRouter);
 
 app.listen(Config.PORT, () =>
   console.log(`Escuchando en el puerto ${Config.PORT}`)
