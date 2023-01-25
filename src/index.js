@@ -1,40 +1,26 @@
 import express from "express";
-import cookieParser from "cookie-parser";
-import session from "express-session";
-import mainRouter from "./routes/user.routes.js";
-import MongoStore from "connect-mongo";
-import config from "./config/conection.js";
-import dotenv from "dotenv";
-dotenv.config();
+import infoRouter from "./routes/infoRoute.js";
+import randomRouter from "./routes/randomRoute.js";
+import Config from "./config/index.js";
+import minimist from "minimist";
 
-const ttlSeconds = 180;
-
-const StoreOptions = {
-  store: MongoStore.create({
-    mongoUrl: config.MONGO_ATLAS_URL,
-    crypto: {
-      secret: "1234",
-    },
-  }),
-  secret: "secretString",
-  resave: true,
-  saveUninitialized: false,
-  cookie: {
-    maxAge: ttlSeconds * 1000,
+const optionalArgsObject = {
+  alias: {
+    p: "puerto",
+  },
+  default: {
+    p: "8080",
   },
 };
 
+export const args = minimist(process.argv, optionalArgsObject);
+
 const app = express();
+
 app.use(express.json());
-app.use(express.static("public"));
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
-app.use(session(StoreOptions));
-app.set("view engine", "ejs");
 
-app.use("/", mainRouter);
+app.use("/api", infoRouter, randomRouter);
 
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-  console.log(`Server up en puerto ${PORT}`);
-});
+app.listen(Config.PORT, () =>
+  console.log(`Escuchando en el puerto ${Config.PORT}`)
+);
